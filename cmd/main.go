@@ -36,7 +36,7 @@ func main() {
 		os.Exit(1)
 	}
 
-	fmt.Println(answer)
+	fmt.Println(string(answer))
 
 	// do some other operations with answer
 	//

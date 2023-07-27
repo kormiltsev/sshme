@@ -6,7 +6,7 @@ import (
 )
 
 // parseflag parses flags.
-func (j *Job) ParseFlag() error {
+func (j *Job) ParseFlags() error {
 
 	// Client settings
 	flag.StringVar(&j.IP, "ip", "", "server's IP")

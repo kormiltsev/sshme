@@ -20,9 +20,9 @@ func StartJob() (*Job, error) {
 	return &Job{Answer: make([]byte, 0)}, nil
 }
 
-func ExecRemotely(ip, user, pathToKey string) ([]byte, error) {
+func (j *Job) ExecRemotely() ([]byte, error) {
 
-	privateBytes, err := os.ReadFile(pathToKey)
+	privateBytes, err := os.ReadFile(j.PathToKey)
 	if err != nil {
 		log.Println("Failed to load private key: ", err)
 		return nil, err
@@ -35,7 +35,7 @@ func ExecRemotely(ip, user, pathToKey string) ([]byte, error) {
 	}
 
 	config := &ssh.ClientConfig{
-		User: user,
+		User: j.User,
 		Auth: []ssh.AuthMethod{
 			ssh.PublicKeys(key),
 		},
@@ -43,7 +43,7 @@ func ExecRemotely(ip, user, pathToKey string) ([]byte, error) {
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
-	client, err := ssh.Dial("tcp", ip, config)
+	client, err := ssh.Dial("tcp", j.IP, config)
 	if err != nil {
 		log.Println("Dial failed:", err)
 		return nil, err
@@ -57,9 +57,7 @@ func ExecRemotely(ip, user, pathToKey string) ([]byte, error) {
 		log.Println("Session failed:", err)
 		return nil, err
 	}
-
-	command := job()
-	output, err := session.CombinedOutput(command)
+	output, err := session.CombinedOutput(j.Command)
 
 	if err != nil {
 		log.Println("CombinedOutput failed:", err)
