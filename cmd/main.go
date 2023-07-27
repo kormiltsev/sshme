@@ -22,12 +22,14 @@ func main() {
 		os.Exit(1)
 	}
 
-	command := `echo "==================== RAM ===================="; free -h | awk 'NR==1 {print $1 "  " $2 "  " $3}'; free -h | awk 'NR==2 {print $2 " " $3 " " $4}'; echo "=================== DRIVES =================="; df -H`
+	if job.Command == "" {
+		command := `echo "==================== RAM ===================="; free -h | awk 'NR==1 {print $1 "  " $2 "  " $3}'; free -h | awk 'NR==2 {print $2 " " $3 " " $4}'; echo "=================== DRIVES =================="; df -H`
 
-	err = job.SetCommand(command)
-	if err != nil {
-		log.Println("SetCommand error: ", err)
-		os.Exit(1)
+		err = job.SetCommand(command)
+		if err != nil {
+			log.Println("SetCommand error: ", err)
+			os.Exit(1)
+		}
 	}
 
 	answer, err := job.ExecRemotely()
