@@ -9,17 +9,19 @@ import (
 )
 
 type Job struct {
-	IP        string
-	User      string
-	PathToKey string
-	Command   string
-	Answer    []byte
+	IP        string `env:"SSHME_IP"`
+	User      string `env:"SSHME_USER"`
+	PathToKey string `env:"SSHME_KEY"`
+	Command   string `env:"-"`
+	Answer    []byte `env:"-"`
 }
 
+// StartJob retirn Job structure
 func StartJob() (*Job, error) {
 	return &Job{Answer: make([]byte, 0)}, nil
 }
 
+// ExecRemotely establish connection and run command
 func (j *Job) ExecRemotely() ([]byte, error) {
 
 	privateBytes, err := os.ReadFile(j.PathToKey)
@@ -57,6 +59,7 @@ func (j *Job) ExecRemotely() ([]byte, error) {
 		log.Println("Session failed:", err)
 		return nil, err
 	}
+
 	output, err := session.CombinedOutput(j.Command)
 
 	if err != nil {
