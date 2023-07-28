@@ -16,10 +16,12 @@ type Job struct {
 	Answer    []byte `env:"-"`
 }
 
+// StartJob retirn Job structure
 func StartJob() (*Job, error) {
 	return &Job{Answer: make([]byte, 0)}, nil
 }
 
+// ExecRemotely establish connection and run command
 func (j *Job) ExecRemotely() ([]byte, error) {
 
 	privateBytes, err := os.ReadFile(j.PathToKey)

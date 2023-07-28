@@ -10,17 +10,19 @@ import (
 	"github.com/joho/godotenv"
 )
 
-// parseflag parses flags.
+// ParseFlags parses flags and environments.
 func (j *Job) ParseFlags() error {
 
-	if err := j.Environment(); err != nil {
-		return err
+	j.file()
+
+	if err := j.environment(); err != nil {
+		log.Println("Environment error:", err)
 	}
 
-	flag.StringVar(&j.IP, "ip", "", "server's IP")
-	flag.StringVar(&j.User, "u", "", "username")
-	flag.StringVar(&j.PathToKey, "k", "", "path to key (ex: '/Users/username/.ssh/id_rsa' )")
-	flag.StringVar(&j.PathToKey, "exec", "", "remote server to exec")
+	flag.StringVar(&j.IP, "ip", j.IP, fmt.Sprintf("server's IP (%s)", j.IP))
+	flag.StringVar(&j.User, "u", j.User, fmt.Sprintf("username (%s)", j.User))
+	flag.StringVar(&j.PathToKey, "k", j.PathToKey, fmt.Sprintf("path to key (ex: '/Users/username/.ssh/id_rsa' ) (%s)", j.PathToKey))
+	flag.StringVar(&j.Command, "exec", "", "remote server to exec")
 
 	flag.Parse()
 
@@ -31,7 +33,7 @@ func (j *Job) ParseFlags() error {
 }
 
 // Environment returns ENV values
-func (j *Job) Environment() error {
+func (j *Job) environment() error {
 	err := env.Parse(j)
 	if err != nil {
 		return err
@@ -40,7 +42,8 @@ func (j *Job) Environment() error {
 	return nil
 }
 
-func (j *Job) File() {
+// File returns values from .env file
+func (j *Job) file() {
 	godotenv.Load()
 	j.IP = os.Getenv("SSHME_IP")
 	j.User = os.Getenv("SSHME_USER")
