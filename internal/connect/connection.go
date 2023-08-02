@@ -16,7 +16,7 @@ type Job struct {
 	Answer    []byte `env:"-"`
 }
 
-// StartJob retirn Job structure
+// StartJob return Job structure
 func StartJob() (*Job, error) {
 	return &Job{Answer: make([]byte, 0)}, nil
 }

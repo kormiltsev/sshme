@@ -38,7 +38,7 @@ func (j *Job) environment() error {
 	if err != nil {
 		return err
 	}
-	log.Println("got from env:", j)
+	// log.Println("got from env:", j)
 	return nil
 }
 
