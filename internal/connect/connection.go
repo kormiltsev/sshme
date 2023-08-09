@@ -8,6 +8,7 @@ import (
 	"golang.org/x/crypto/ssh"
 )
 
+// Job is one time request to remote server to run command
 type Job struct {
 	IP        string `env:"SSHME_IP"`
 	User      string `env:"SSHME_USER"`
@@ -16,17 +17,18 @@ type Job struct {
 	Answer    []byte `env:"-"`
 }
 
-// StartJob return Job structure
+// StartJob return Job structure.
 func StartJob() (*Job, error) {
 	return &Job{Answer: make([]byte, 0)}, nil
 }
 
-// ExecRemotely establish connection and run command
+// ExecRemotely makes connection and run command.
 func (j *Job) ExecRemotely() ([]byte, error) {
 
+	// reading private key
 	privateBytes, err := os.ReadFile(j.PathToKey)
 	if err != nil {
-		log.Println("Failed to load private key: ", err)
+		log.Println("Failed to load private key file: ", err)
 		return nil, err
 	}
 
@@ -36,6 +38,7 @@ func (j *Job) ExecRemotely() ([]byte, error) {
 		return nil, err
 	}
 
+	//set configs
 	config := &ssh.ClientConfig{
 		User: j.User,
 		Auth: []ssh.AuthMethod{
@@ -45,6 +48,7 @@ func (j *Job) ExecRemotely() ([]byte, error) {
 		HostKeyCallback: ssh.InsecureIgnoreHostKey(),
 	}
 
+	//set connection
 	client, err := ssh.Dial("tcp", j.IP, config)
 	if err != nil {
 		log.Println("Dial failed:", err)
@@ -53,15 +57,15 @@ func (j *Job) ExecRemotely() ([]byte, error) {
 
 	defer client.Close()
 
+	//new session
 	session, err := client.NewSession()
-
 	if err != nil {
 		log.Println("Session failed:", err)
 		return nil, err
 	}
 
+	//doing request
 	output, err := session.CombinedOutput(j.Command)
-
 	if err != nil {
 		log.Println("CombinedOutput failed:", err)
 		return nil, err
